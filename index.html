@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#c0392b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Astitva" />
+  <meta name="description" content="Personal safety guidance — dangerous situations, self-defence, and helping others" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <title>Astitva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --red: #c0392b;
+      --red-light: #f9eceb;
+      --red-dark: #922b21;
+      --bg: #0f1117;
+      --bg2: #161b26;
+      --bg3: #1e2535;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.14);
+      --text: #f0ede8;
+      --text2: #9ba3b2;
+      --text3: #626a7a;
+      --green: #1e7d52;
+      --green-light: #d4eddf;
+      --amber: #9a6c1a;
+      --amber-light: #fef3de;
+      --info: #1b6ca8;
+      --info-light: #ddeeff;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Mukta', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,17,23,0.92);
+      backdrop-filter: blur(12px);
+      padding: calc(var(--safe-top) + 12px) 20px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo-mark {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: var(--red);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-mark svg { width: 20px; height: 20px; fill: white; }
+    .app-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; font-weight: 600;
+      letter-spacing: 0.3px;
+      color: var(--text);
+    }
+    .app-tagline { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+    /* ── SOS Banner ── */
+    .sos-banner {
+      margin: 16px 16px 0;
+      background: var(--red);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      display: flex; align-items: center; gap: 14px;
+      cursor: pointer;
+      active: scale(0.98);
+      transition: opacity 0.15s;
+    }
+    .sos-banner:active { opacity: 0.88; }
+    .sos-icon { font-size: 28px; flex-shrink: 0; }
+    .sos-text h2 { font-size: 16px; font-weight: 600; color: white; }
+    .sos-text p { font-size: 12px; color: rgba(255,255,255,0.75); margin-top: 2px; }
+    .sos-arrow { margin-left: auto; font-size: 20px; color: rgba(255,255,255,0.6); flex-shrink: 0; }
+
+    /* ── Tabs ── */
+    .tabs-wrap {
+      position: sticky; top: 60px; z-index: 90;
+      background: rgba(15,17,23,0.95);
+      backdrop-filter: blur(8px);
+      padding: 12px 16px;
+      display: flex; gap: 8px;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .tabs-wrap::-webkit-scrollbar { display: none; }
+    .tab {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border-radius: 30px;
+      border: 1px solid var(--border2);
+      background: var(--bg2);
+      font-size: 13px; font-weight: 500;
+      color: var(--text2);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .tab.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: white;
+    }
+
+    /* ── Main content ── */
+    .content { padding: 16px 16px calc(var(--safe-bottom) + 24px); }
+
+    /* ── Category grid ── */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .cat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .cat-card:active { transform: scale(0.97); }
+    .cat-card.selected {
+      border-color: var(--red);
+      background: rgba(192,57,43,0.12);
+    }
+    .cat-emoji { font-size: 24px; margin-bottom: 10px; display: block; }
+    .cat-card h3 { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .cat-card p { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.4; }
+
+    /* ── Guidance panel ── */
+    .guidance-panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .panel-header-icon { font-size: 20px; }
+    .panel-header h2 { font-size: 15px; font-weight: 600; color: var(--text); }
+
+    .step {
+      display: flex; gap: 14px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; flex-shrink: 0; margin-top: 1px;
+    }
+    .step-num.urgent { background: rgba(192,57,43,0.18); color: #e74c3c; }
+    .step-num.normal { background: var(--bg3); color: var(--text2); }
+    .step-num.safe { background: rgba(30,125,82,0.18); color: #2ecc71; }
+    .step h4 { font-size: 14px; font-weight: 600; color: var(--text); }
+    .step p { font-size: 13px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+
+    .placeholder {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--text3);
+      font-size: 14px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .placeholder-icon { font-size: 32px; display: block; margin-bottom: 10px; }
+
+    /* ── Ask AI section ── */
+    .ask-label { font-size: 14px; color: var(--text2); margin-bottom: 12px; line-height: 1.5; }
+    .ask-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .ask-input {
+      flex: 1;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      font-size: 14px; font-family: 'Mukta', sans-serif;
+      color: var(--text);
+      outline: none;
+    }
+    .ask-input::placeholder { color: var(--text3); }
+    .ask-input:focus { border-color: var(--red); }
+    .ask-btn {
+      background: var(--red);
+      border: none; border-radius: var(--radius-sm);
+      color: white; font-size: 14px; font-weight: 600;
+      padding: 12px 16px;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: 'Mukta', sans-serif;
+    }
+    .ask-btn:active { opacity: 0.85; }
+    .ai-response {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      font-size: 14px; color: var(--text); line-height: 1.6;
+    }
+    .ai-response.loading { color: var(--text3); font-style: italic; }
+
+    /* ── Helplines strip ── */
+    .helplines {
+      margin-top: 16px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+    .helplines h3 { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .helpline-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .helpline-row:last-child { border-bottom: none; }
+    .helpline-name { font-size: 13px; color: var(--text2); }
+    .helpline-num {
+      font-size: 15px; font-weight: 600; color: var(--red);
+      text-decoration: none;
+    }
+
+    /* ── SOS Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.75);
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--bg2);
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 20px 20px calc(var(--safe-bottom) + 24px);
+      width: 100%; max-height: 85dvh;
+      overflow-y: auto;
+      border-top: 1px solid var(--border);
+    }
+    .modal-handle { width: 40px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 16px; }
+    .modal-box h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--red); margin-bottom: 16px; }
+    .sos-step { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+    .sos-step-num { width: 26px; height: 26px; border-radius: 50%; background: rgba(192,57,43,0.2); color: #e74c3c; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sos-step p { font-size: 14px; color: var(--text); line-height: 1.5; padding-top: 3px; }
+    .modal-close {
+      width: 100%; padding: 14px;
+      background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      color: var(--text2); font-size: 15px; font-weight: 500;
+      cursor: pointer; font-family: 'Mukta', sans-serif;
+      margin-top: 8px;
+    }
+    .modal-close:active { opacity: 0.8; }
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/>
+    </svg>
+  </div>
+  <div>
+    <div class="app-name">Astitva</div>
+    <div class="app-tagline">your safety, always</div>
+  </div>
+</header>
+
+<div class="sos-banner" onclick="openSOS()" role="button" aria-label="Emergency guidance">
+  <span class="sos-icon">🚨</span>
+  <div class="sos-text">
+    <h2>In immediate danger?</h2>
+    <p>Tap for emergency steps — fast &amp; clear</p>
+  </div>
+  <span class="sos-arrow">›</span>
+</div>
+
+<div class="tabs-wrap" role="tablist">
+  <div class="tab active" onclick="setTab('situation',this)" role="tab">I'm in danger</div>
+  <div class="tab" onclick="setTab('selfdefence',this)" role="tab">Self-defence</div>
+  <div class="tab" onclick="setTab('assist',this)" role="tab">Help others</div>
+  <div class="tab" onclick="setTab('ask',this)" role="tab">Ask Astitva</div>
+</div>
+
+<main class="content">
+
+  <!-- SITUATION -->
+  <div id="panel-situation">
+    <div class="cat-grid">
+      <div class="cat-card" onclick="selectCat('abuse',this)">
+        <span class="cat-emoji">🏠</span>
+        <h3>Domestic abuse</h3>
+        <p>Home violence or control</p>
+      </div>
+      <div class="cat-card" onclick="selectCat('kidnap',this)">
+        <span class="cat-emoji">🚷</span>
+        <h3>Abduction</h3>
+        <p>Kidnapping or forced hold</p>
+      </div>
+      <div class="cat-card" onclick="selectCat('assault',this)">
+        <span class="cat-emoji">🏃</span>
+        <h3>Physical assault</h3>
+        <p>Being attacked now</p>
+      </div>
+      <div class="cat-card" onclick="selectCat('stalking',this)">
+        <span class="cat-emoji">👁️</span>
+        <h3>Stalking</h3>
+        <p>Being followed or watched</p>
+      </div>
+      <div class="cat-card" onclick="selectCat('harassment',this)">
+        <span class="cat-emoji">📵</span>
+        <h3>Harassment</h3>
+        <p>Online or in person</p>
+      </div>
+      <div class="cat-card" onclick="selectCat('trapped',this)">
+        <span class="cat-emoji">🔒</span>
+        <h3>Trapped</h3>
+        <p>Unable to leave safely</p>
+      </div>
+    </div>
+    <div id="guidance-area">
+      <div class="placeholder">
+        <span class="placeholder-icon">👆</span>
+        Select a situation above for step-by-step guidance
+      </div>
+    </div>
+  </div>
+
+  <!-- SELF-DEFENCE -->
+  <div id="panel-selfdefence" style="display:none">
+    <div class="cat-grid">
+      <div class="cat-card" onclick="selectSD('awareness',this)">
+        <span class="cat-emoji">📡</span>
+        <h3>Situational awareness</h3>
+        <p>Spot danger early</p>
+      </div>
+      <div class="cat-card" onclick="selectSD('escape',this)">
+        <span class="cat-emoji">🚪</span>
+        <h3>Escape grabs</h3>
+        <p>Break free techniques</p>
+      </div>
+      <div class="cat-card" onclick="selectSD('verbal',this)">
+        <span class="cat-emoji">🗣️</span>
+        <h3>De-escalation</h3>
+        <p>Talk down a threat</p>
+      </div>
+      <div class="cat-card" onclick="selectSD('strikes',this)">
+        <span class="cat-emoji">✋</span>
+        <h3>Basic strikes</h3>
+        <p>Last-resort defence</p>
+      </div>
+    </div>
+    <div id="sd-guidance-area">
+      <div class="placeholder">
+        <span class="placeholder-icon">👆</span>
+        Select a topic to see techniques
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSIST -->
+  <div id="panel-assist" style="display:none">
+    <div class="cat-grid">
+      <div class="cat-card" onclick="selectAssist('witness',this)">
+        <span class="cat-emoji">👥</span>
+        <h3>Witnessing violence</h3>
+        <p>Bystander steps</p>
+      </div>
+      <div class="cat-card" onclick="selectAssist('friend',this)">
+        <span class="cat-emoji">🤝</span>
+        <h3>Helping a friend</h3>
+        <p>Abuse or unsafe situation</p>
+      </div>
+      <div class="cat-card" onclick="selectAssist('child',this)">
+        <span class="cat-emoji">👶</span>
+        <h3>Child in danger</h3>
+        <p>Protecting a minor</p>
+      </div>
+      <div class="cat-card" onclick="selectAssist('report',this)">
+        <span class="cat-emoji">📋</span>
+        <h3>Reporting safely</h3>
+        <p>How to report with care</p>
+      </div>
+    </div>
+    <div id="assist-guidance-area">
+      <div class="placeholder">
+        <span class="placeholder-icon">👆</span>
+        Select a scenario to see how to help
+      </div>
+    </div>
+  </div>
+
+  <!-- ASK AI -->
+  <div id="panel-ask" style="display:none">
+    <p class="ask-label">Ask Astitva anything about personal safety. Get clear, practical guidance.</p>
+    <div class="ask-row">
+      <input class="ask-input" type="text" id="ai-question" placeholder="e.g. Someone is following me home…" />
+      <button class="ask-btn" onclick="askAI()">Ask →</button>
+    </div>
+    <div id="ai-response" class="ai-response" style="display:none"></div>
+
+    <div class="helplines">
+      <h3>India helplines</h3>
+      <div class="helpline-row">
+        <span class="helpline-name">Emergency</span>
+        <a class="helpline-num" href="tel:112">112</a>
+      </div>
+      <div class="helpline-row">
+        <span class="helpline-name">Police</span>
+        <a class="helpline-num" href="tel:100">100</a>
+      </div>
+      <div class="helpline-row">
+        <span class="helpline-name">Women's helpline</span>
+        <a class="helpline-num" href="tel:181">181</a>
+      </div>
+      <div class="helpline-row">
+        <span class="helpline-name">Childline</span>
+        <a class="helpline-num" href="tel:1098">1098</a>
+      </div>
+      <div class="helpline-row">
+        <span class="helpline-name">Cyber crime</span>
+        <a class="helpline-num" href="tel:1930">1930</a>
+      </div>
+      <div class="helpline-row">
+        <span class="helpline-name">iCall (mental health)</span>
+        <a class="helpline-num" href="tel:9152987821">9152987821</a>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- SOS MODAL -->
+<div class="modal-overlay" id="sos-modal" role="dialog" aria-modal="true" aria-label="Emergency guidance">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <h2>🚨 Emergency steps</h2>
+    <div class="sos-step"><div class="sos-step-num">1</div><p>Call <strong>112</strong> immediately if safe to do so. Leave the line open even if you cannot speak — operators will trace you.</p></div>
+    <div class="sos-step"><div class="sos-step-num">2</div><p>Get to a public place — shops, hospitals, police stations, or anywhere with people around.</p></div>
+    <div class="sos-step"><div class="sos-step-num">3</div><p>If trapped, signal for help — bang on walls, flash lights, shout near windows or vents.</p></div>
+    <div class="sos-step"><div class="sos-step-num">4</div><p>Text your location to a trusted person. Use a code word if you need to be discreet.</p></div>
+    <div class="sos-step"><div class="sos-step-num">5</div><p>Stay calm. Breathe slowly. Assess your exit options. Your instincts are valid — trust them.</p></div>
+    <button class="modal-close" onclick="closeSOS()">Close</button>
+  </div>
+</div>
+
+<script>
+const guidance = {
+  abuse: { title:'Domestic abuse', emoji:'🏠', steps:[
+    {n:1,t:'urgent',h:'Move to a safer room',b:"Go to a room with an exit. Avoid kitchens or garages where weapons are accessible."},
+    {n:2,t:'urgent',h:'Call for help discreetly',b:"Dial 112 or 100 (police) or 181 (women's helpline). Stay on the line even in silence."},
+    {n:3,t:'normal',h:'Use a pre-agreed code word',b:"Text a trusted friend or family member your code word so they know to call help."},
+    {n:4,t:'normal',h:'Document injuries when safe',b:"Photograph injuries or damage when you are safe. This becomes evidence for authorities."},
+    {n:5,t:'safe',h:'Prepare your exit plan',b:"Keep ID, phone, cash, medication in a ready bag. Know your route to a shelter or safe home."}
+  ]},
+  kidnap: { title:'Abduction', emoji:'🚷', steps:[
+    {n:1,t:'urgent',h:'Resist loudly in the first moments',b:"Shout, scream, and resist immediately. Abductors want silence and compliance — noise draws attention."},
+    {n:2,t:'urgent',h:'Drop objects as trail markers',b:"Leave your phone, watch, or clothing along the path if possible. This helps searchers trace your route."},
+    {n:3,t:'normal',h:'Memorise your surroundings',b:"Count turns, note smells, sounds, and time elapsed. This information helps authorities later."},
+    {n:4,t:'normal',h:'Cooperate if resistance becomes dangerous',b:"Once fighting back risks your life, comply. Stay alert and look for escape moments."},
+    {n:5,t:'safe',h:'Signal to people when possible',b:"Near others? Blink in patterns, hold up fingers, make eye contact, mouth 'HELP'."}
+  ]},
+  assault: { title:'Physical assault', emoji:'🏃', steps:[
+    {n:1,t:'urgent',h:'Run — escape is always first',b:"Get to a crowded, lit area. Put as much distance as possible between you and the attacker."},
+    {n:2,t:'urgent',h:"Shout 'FIRE', not 'HELP'",b:"People respond faster to fire. Shout loudly to draw bystanders and attention."},
+    {n:3,t:'normal',h:'Use your body if caught',b:"Strike eyes, nose, throat, or groin — these are highly sensitive. Use your elbows and knees."},
+    {n:4,t:'normal',h:'Use your surroundings',b:"Keys, bags, or any object can be used defensively. Put obstacles between you and the attacker."},
+    {n:5,t:'safe',h:'Get safe, then call and report',b:"Call 100 or 112 once safe. Seek medical attention. Preserve evidence — do not wash or change clothes."}
+  ]},
+  stalking: { title:'Stalking', emoji:'👁️', steps:[
+    {n:1,t:'urgent',h:'Trust your instincts immediately',b:"If you feel followed, you probably are. Act on it — don't dismiss the feeling."},
+    {n:2,t:'normal',h:'Alter your routine unpredictably',b:"Change routes, timings, and habits. Stalkers rely entirely on predictability."},
+    {n:3,t:'normal',h:'Document every incident',b:"Log dates, times, locations, descriptions. Screenshot messages. Essential for legal action."},
+    {n:4,t:'normal',h:'Inform security around you',b:"Tell your home building, workplace, or school. More aware eyes increase your safety significantly."},
+    {n:5,t:'safe',h:'File a police report',b:"In India, report under IPC Section 354D (stalking). A restraining order is obtainable through courts."}
+  ]},
+  harassment: { title:'Harassment', emoji:'📵', steps:[
+    {n:1,t:'normal',h:'Do not engage',b:"Avoid responding to provocation. Engagement often escalates. Stay calm and leave if possible."},
+    {n:2,t:'normal',h:'Preserve all evidence',b:"Screenshot messages, note times and witnesses. Evidence makes formal reports far more effective."},
+    {n:3,t:'normal',h:'Block and restrict access everywhere',b:"All platforms, all accounts. Adjust privacy settings. Report to platform support with your evidence."},
+    {n:4,t:'normal',h:'Tell a trusted person',b:"Don't face harassment alone. Another person can help you assess risk and take decisive action."},
+    {n:5,t:'safe',h:'Report formally',b:"Online: cybercrime.gov.in or call 1930. In person: lodge an FIR at your local police station."}
+  ]},
+  trapped: { title:'Trapped', emoji:'🔒', steps:[
+    {n:1,t:'urgent',h:'Signal discreetly to the outside',b:"Place 'SOS' or '999' in a window. Use mirrors or lights to signal. These are internationally recognised."},
+    {n:2,t:'urgent',h:'Contact help without being seen',b:"Text if you cannot call. Share your location on WhatsApp. Use silent emergency features on your phone."},
+    {n:3,t:'normal',h:'Assess every possible exit',b:"Windows, vents, skylights — consider all options. Identify objects that could break glass if needed."},
+    {n:4,t:'normal',h:'Create a diversion',b:"Noise in one area can draw attention away, giving you a window to move toward an exit."},
+    {n:5,t:'safe',h:'Stay calm and patient',b:"If immediate escape is impossible, conserve energy and stay mentally sharp. Wait for the right moment."}
+  ]}
+};
+
+const sdGuidance = {
+  awareness: { title:'Situational awareness', emoji:'📡', steps:[
+    {n:1,t:'normal',h:'The colour code system',b:"White = relaxed, Yellow = alert, Orange = threat identified, Red = act. Train yourself to stay in Yellow in public."},
+    {n:2,t:'normal',h:'Pre-attack signals to watch',b:"Target glancing, matching your pace, checking who is nearby. These behaviours signal intent."},
+    {n:3,t:'normal',h:'Choose seats and positions wisely',b:"Sit with your back to walls. Face entrances. Note two exits in every new environment."},
+    {n:4,t:'normal',h:'Limit phone distraction in public',b:"Looking at your phone makes you a softer target. Stay visually aware, especially at night."},
+    {n:5,t:'safe',h:'Always plan two exits',b:"In any new space, find two ways out. This habit becomes automatic and can save your life."}
+  ]},
+  escape: { title:'Escape from grabs', emoji:'🚪', steps:[
+    {n:1,t:'normal',h:'Wrist grab escape',b:"Rotate your wrist toward the attacker's thumb — the weakest point of any grip. Pull sharply and step back."},
+    {n:2,t:'normal',h:'Bear hug from behind',b:"Drop your weight suddenly, stomp on their foot, throw your head back into their face, then run."},
+    {n:3,t:'normal',h:'Choke from the front',b:"Tuck your chin, step to the side, bring both arms up through their arms to break the grip, then push away."},
+    {n:4,t:'normal',h:'Hair grab',b:"Grip their hand on your head to reduce pain, turn into the direction of the pull, and strike with your free hand."},
+    {n:5,t:'safe',h:'Once free — run immediately',b:"Never stay to fight if you can escape. Run toward light, people, and noise. Speed is your advantage."}
+  ]},
+  verbal: { title:'De-escalation', emoji:'🗣️', steps:[
+    {n:1,t:'normal',h:'Stay calm in voice and body',b:"Lower your voice, slow your speech, keep open body language. Aggression mirrors aggression."},
+    {n:2,t:'normal',h:'Give them a face-saving exit',b:"Most people don't want to escalate — they want to feel respected. Offer them a way out with dignity."},
+    {n:3,t:'normal',h:'Use their name if you know it',b:"It creates human connection and reminds them — and you — that they are a person, not just a threat."},
+    {n:4,t:'normal',h:'Avoid commands',b:"Say 'I understand you're upset' not 'Calm down.' Commands escalate. Empathy diffuses."},
+    {n:5,t:'safe',h:'Create space while talking',b:"Slowly increase distance. If they close the gap each time, that is a warning sign to act."}
+  ]},
+  strikes: { title:'Basic defensive strikes', emoji:'✋', steps:[
+    {n:1,t:'urgent',h:'Only ever as a last resort',b:"Use strikes only when escape is impossible and you face immediate danger. Run first. Always run first."},
+    {n:2,t:'normal',h:'Palm strike to nose',b:"Heel of palm upward into the nose — causes pain, watering eyes, disorientation. Buys escape time."},
+    {n:3,t:'normal',h:'Elbow strike to face',b:"The elbow is your hardest natural weapon. Short sharp strike to temple, chin, or nose at close range."},
+    {n:4,t:'normal',h:'Knee to groin',b:"Effective regardless of attacker size. Grab their shoulders for leverage and drive your knee sharply upward."},
+    {n:5,t:'safe',h:'Strike then escape immediately',b:"The only goal of any strike is to create seconds. Use those seconds to run — not to fight further."}
+  ]}
+};
+
+const assistGuidance = {
+  witness: { title:'Witnessing violence', emoji:'👥', steps:[
+    {n:1,t:'urgent',h:'Call emergency services first',b:"Dial 112 immediately. Stay on the line and describe what you see. Never assume someone else called."},
+    {n:2,t:'normal',h:'Do not intervene physically unless safe',b:"Your safety matters too. Creating a crowd deters attackers. Bring others toward the scene."},
+    {n:3,t:'normal',h:'Address the victim directly',b:"Speak to the person being hurt: 'I see you. Help is coming.' This grounds them and signals they are not alone."},
+    {n:4,t:'normal',h:'Document if safe to do so',b:"Record video or photos if you are not at risk. This evidence is vital for authorities and justice."},
+    {n:5,t:'safe',h:'Give a statement to police',b:"Stay to give your account. Witnesses are critical to justice. Your action may save a life."}
+  ]},
+  friend: { title:'Helping a friend', emoji:'🤝', steps:[
+    {n:1,t:'normal',h:'Listen without judgment',b:"Believe them. Many fear not being believed. Your first response sets the tone for their trust in you."},
+    {n:2,t:'normal',h:'Do not pressure or give ultimatums',b:"Leaving abuse is a process, not a moment. Support their pace or they may withdraw from you entirely."},
+    {n:3,t:'normal',h:'Help them plan safely',b:"Discuss code words, a safe place to go, and important documents to gather when they are ready."},
+    {n:4,t:'normal',h:'Connect them to professional support',b:"iCall: 9152987821. Vandrevala Foundation: 1860-2662-345. Trained professionals make a real difference."},
+    {n:5,t:'safe',h:'Stay in regular contact',b:"Check in often. Knowing someone cares reduces isolation — the abuser's most powerful tool."}
+  ]},
+  child: { title:'Child in danger', emoji:'👶', steps:[
+    {n:1,t:'urgent',h:'Call authorities without delay',b:"Dial 1098 (Childline) or 112. Report your concerns — you don't need proof, just reasonable belief."},
+    {n:2,t:'normal',h:'Speak to the child in a safe space',b:"If you know them, use open questions privately: 'How are things at home? Is everything okay?'"},
+    {n:3,t:'normal',h:'Do not confront the abuser directly',b:"Doing so may put the child at greater risk. Let trained authorities handle the confrontation."},
+    {n:4,t:'normal',h:'Document what you have observed',b:"Write down what you saw and heard — dates, times, descriptions. Hand this record to authorities."},
+    {n:5,t:'safe',h:'Provide consistent ongoing support',b:"Children with one trusted adult who stays present are significantly more resilient. Be that person."}
+  ]},
+  report: { title:'Reporting safely', emoji:'📋', steps:[
+    {n:1,t:'normal',h:'Know your reporting options',b:"Anonymous reports are possible via Childline (1098), NCW (ncw.nic.in), and cybercrime.gov.in."},
+    {n:2,t:'normal',h:'Gather evidence before you report',b:"Screenshots, dates, times, names, witness contacts — compile these to make your report far stronger."},
+    {n:3,t:'normal',h:'Choose the right reporting channel',b:"Police FIR for physical crimes. Online portal for cyber crimes. NGOs can guide you to the best path."},
+    {n:4,t:'normal',h:'Protect your identity if needed',b:"Ask about anonymous reporting options before disclosing your identity in any formal report."},
+    {n:5,t:'safe',h:'Follow up consistently',b:"Get a complaint number. Follow up regularly. An NGO advocate alongside you strengthens your position."}
+  ]}
+};
+
+function renderSteps(data) {
+  return `<div class="guidance-panel">
+    <div class="panel-header">
+      <span class="panel-header-icon">${data.emoji}</span>
+      <h2>${data.title}</h2>
+    </div>
+    ${data.steps.map(s => `
+      <div class="step">
+        <div class="step-num ${s.t}">${s.n}</div>
+        <div>
+          <h4>${s.h}</h4>
+          <p>${s.b}</p>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+
+let activeCat = null;
+function selectCat(key, el) {
+  if (activeCat) activeCat.classList.remove('selected');
+  el.classList.add('selected'); activeCat = el;
+  document.getElementById('guidance-area').innerHTML = renderSteps(guidance[key]);
+}
+
+let activeSD = null;
+function selectSD(key, el) {
+  if (activeSD) activeSD.classList.remove('selected');
+  el.classList.add('selected'); activeSD = el;
+  document.getElementById('sd-guidance-area').innerHTML = renderSteps(sdGuidance[key]);
+}
+
+let activeAssist = null;
+function selectAssist(key, el) {
+  if (activeAssist) activeAssist.classList.remove('selected');
+  el.classList.add('selected'); activeAssist = el;
+  document.getElementById('assist-guidance-area').innerHTML = renderSteps(assistGuidance[key]);
+}
+
+function setTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['situation','selfdefence','assist','ask'].forEach(p => {
+    document.getElementById('panel-' + p).style.display = p === name ? '' : 'none';
+  });
+}
+
+function openSOS() { document.getElementById('sos-modal').classList.add('open'); }
+function closeSOS() { document.getElementById('sos-modal').classList.remove('open'); }
+
+document.getElementById('sos-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeSOS();
+});
+
+async function askAI() {
+  const q = document.getElementById('ai-question').value.trim();
+  if (!q) return;
+  const resp = document.getElementById('ai-response');
+  resp.style.display = 'block';
+  resp.className = 'ai-response loading';
+  resp.textContent = 'Astitva is thinking…';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: 'You are Astitva, a compassionate personal safety assistant. Give clear, practical, step-by-step safety guidance. Keep responses concise — 3 to 5 actionable points. The user may be in India, so include relevant local resources and helplines where helpful (112, 100, 181, 1098, 1930). Be calm, direct, and empowering.',
+        messages: [{ role: 'user', content: q }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(c => c.text || '').join('') || 'Unable to get a response. Please try again.';
+    resp.className = 'ai-response';
+    resp.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  } catch(e) {
+    resp.className = 'ai-response';
+    resp.textContent = 'Connection error. Please check your internet and try again.';
+  }
+}
+
+document.getElementById('ai-question').addEventListener('keydown', e => {
+  if (e.key === 'Enter') askAI();
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
